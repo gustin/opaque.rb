@@ -5,7 +5,8 @@ class PlaintextTest < Minitest::Test
     refute_nil ::Plaintext::VERSION
   end
 
-  def test_it_does_something_useful
-    assert false
+  def test_generating_totp
+    puts "~)- Ruby Land ~)-"
+    puts PlaintextTotp::ToTp.generate_qr("user 12")
   end
 end
