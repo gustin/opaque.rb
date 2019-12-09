@@ -7,7 +7,7 @@ class PlaintextTest < Minitest::Test
 
   def test_registration
     puts "~) OPAQUE Via Ruby ~)"
-    Plaintext::AuthN::registration_1('larry', 'gawdfly')
+    Plaintext::AuthN::registration_1('larry', [0,0,0,0,0,0,0])
   end
 
 
