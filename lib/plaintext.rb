@@ -18,7 +18,7 @@ module Plaintext
     extend FFI::Library
     ffi_lib '../agent/target/debug/libplaintext_agent.dylib'
 
-    attach_function :registration, [:string, :pointer], :void
+    attach_function :registration, [:string, :pointer], RegistrationStruct.by_value
   end
 
   class RegistrationMe
@@ -28,7 +28,7 @@ module Plaintext
       packed_data = alpha.pack('C*')
 
       raw_data = FFI::MemoryPointer.from_string(packed_data)
-      Plaintext::Library.registration(username, raw_data)
+      beta = Plaintext::Library.registration(username, raw_data)
 
       # raw_data.get_bytes(0, width * height).unpack("C*")
 
