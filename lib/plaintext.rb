@@ -8,7 +8,7 @@ module Plaintext
            :pub_s, :pointer
 
     def to_s
-      "(#{self[:beta]},#{self[:v]}),#{self[:pub_s]}"
+      "Result:(#{self[:beta]},#{self[:v]}),#{self[:pub_s]}"
     end
   end
 
@@ -26,9 +26,22 @@ module Plaintext
       # https://www.rubydoc.info/stdlib/core/Array:pack
       # C is 8-bit unsigned, * is all remaining array elements
       packed_data = alpha.pack('C*')
-
       raw_data = FFI::MemoryPointer.from_string(packed_data)
-      beta = Plaintext::Library.registration(username, raw_data)
+      result = Plaintext::Library.registration(username, raw_data)
+
+#      beta = FFI::MemoryPointer.new(:char, 32)
+#      beta.put_bytes(0, result[:beta])
+
+      # LEAK: move to memory or auto pointers
+      # ap = FFI::AutoPointer.from_native(result[:beta], nil)
+      beta = result[:beta].read_array_of_type(FFI::TYPE_UINT8, :read_uint8, 32)
+      puts "***** Beta"
+      puts beta
+      v = result[:v].read_array_of_type(FFI::TYPE_UINT8, :read_uint8, 32)
+      puts "***** V"
+      puts v
+      pub_s = result[:pub_s].read_array_of_type(FFI::TYPE_UINT8, :read_uint8, 32)
+#      puts pub_s
 
       # raw_data.get_bytes(0, width * height).unpack("C*")
 
@@ -36,6 +49,7 @@ module Plaintext
       # https://github.com/ffi/ffi/wiki/Binary-data
       # memBuf = FFI::MemoryPointer.new(:char, data.bytesize)
       # memBuf.put_bytes(0, data)
+      [beta, v, pub_s]
     end
   end
 

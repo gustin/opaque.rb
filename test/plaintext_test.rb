@@ -8,7 +8,10 @@ class PlaintextTest < Minitest::Test
   def test_registration
     puts '~) OPAQUE Via Ruby ~)'
     alpha = [174, 17, 253, 238, 61, 54, 246, 96, 134, 222, 69, 115, 52, 224, 182, 129, 135, 201, 31, 217, 76, 37, 186, 203, 89, 193, 216, 214, 86, 253, 86, 64]
-    Plaintext::RegistrationMe.registration('larry', alpha)
+    beta, v, pub_s = Plaintext::RegistrationMe.registration('larry', alpha)
+    puts "Beta: #{beta}"
+    puts "V: #{v}"
+    puts "PubS: #{pub_s}"
   end
 
   def test_generating_totp
