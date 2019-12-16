@@ -18,30 +18,31 @@ module Plaintext
     extend FFI::Library
     ffi_lib '../agent/target/debug/libplaintext_agent.dylib'
 
-    attach_function :registration, [:string, :pointer], RegistrationStruct.by_value
+    attach_function :registration_start, [:string, :pointer], RegistrationStruct.by_value
+    attach_function :registration_finalize, [:string, :pointer, :pointer], :void
   end
 
-  class RegistrationMe
-    def self.registration(username, alpha)
+  class Registration
+    def self.start(username, alpha)
       # https://www.rubydoc.info/stdlib/core/Array:pack
       # C is 8-bit unsigned, * is all remaining array elements
       packed_data = alpha.pack('C*')
       raw_data = FFI::MemoryPointer.from_string(packed_data)
-      result = Plaintext::Library.registration(username, raw_data)
+      result = Plaintext::Library.registration_start(username, raw_data)
 
-#      beta = FFI::MemoryPointer.new(:char, 32)
-#      beta.put_bytes(0, result[:beta])
+      #      beta = FFI::MemoryPointer.new(:char, 32)
+      #      beta.put_bytes(0, result[:beta])
 
       # LEAK: move to memory or auto pointers
       # ap = FFI::AutoPointer.from_native(result[:beta], nil)
       beta = result[:beta].read_array_of_type(FFI::TYPE_UINT8, :read_uint8, 32)
-      puts "***** Beta"
+      puts '***** Beta'
       puts beta
       v = result[:v].read_array_of_type(FFI::TYPE_UINT8, :read_uint8, 32)
-      puts "***** V"
+      puts '***** V'
       puts v
       pub_s = result[:pub_s].read_array_of_type(FFI::TYPE_UINT8, :read_uint8, 32)
-#      puts pub_s
+      #      puts pub_s
 
       # raw_data.get_bytes(0, width * height).unpack("C*")
 
@@ -50,6 +51,19 @@ module Plaintext
       # memBuf = FFI::MemoryPointer.new(:char, data.bytesize)
       # memBuf.put_bytes(0, data)
       [beta, v, pub_s]
+    end
+
+    def self.finalize(username, public_key, envelope)
+      packed_public_key = public_key.pack('C*')
+      raw_public_key = FFI::MemoryPointer.from_string(packed_public_key)
+      packed_envelope = envelope.pack('C*')
+      raw_envelope = FFI::MemoryPointer.from_string(packed_envelope)
+
+      result = Plaintext::Library.registration_finalize(
+        username,
+        raw_public_key,
+        raw_envelope
+      )
     end
   end
 
