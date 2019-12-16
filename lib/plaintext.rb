@@ -18,8 +18,25 @@ module Plaintext
     extend FFI::Library
     ffi_lib '../agent/target/debug/libplaintext_agent.dylib'
 
+    attach_function :authenticate_start, [:string, :pointer, :pointer], :void
+#    attach_function :authentication_finalize, [:string, :pointer, :pointer], :void
+
     attach_function :registration_start, [:string, :pointer], RegistrationStruct.by_value
     attach_function :registration_finalize, [:string, :pointer, :pointer], :void
+  end
+
+  class Authentication
+    def self.start(username, alpha, key)
+      packed_alpha = alpha.pack('C*')
+      raw_alpha = FFI::MemoryPointer.from_string(packed_alpha)
+      packed_key = key.pack('C*')
+      raw_key = FFI::MemoryPointer.from_string(packed_key)
+
+      result = Plaintext::Library.authenticate_start(username, raw_alpha, raw_key)
+
+
+
+    end
   end
 
   class Registration
