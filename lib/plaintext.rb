@@ -12,13 +12,25 @@ module Plaintext
     end
   end
 
+  class AuthenticationStruct < FFI::Struct
+    layout :beta, :pointer,
+           :v, :pointer,
+           :envelope, :pointer,
+           :key, :pointer,
+           :y, :pointer
+
+    def to_s
+      "Result:(#{self[:beta]},#{self[:v]}),#{self[:pub_s]}"
+    end
+  end
+
   module Library
     class Error < StandardError; end
 
     extend FFI::Library
     ffi_lib '../agent/target/debug/libplaintext_agent.dylib'
 
-    attach_function :authenticate_start, [:string, :pointer, :pointer], :void
+    attach_function :authenticate_start, [:string, :pointer, :pointer], AuthenticationStruct.by_value
 #    attach_function :authentication_finalize, [:string, :pointer, :pointer], :void
 
     attach_function :registration_start, [:string, :pointer], RegistrationStruct.by_value
@@ -34,8 +46,24 @@ module Plaintext
 
       result = Plaintext::Library.authenticate_start(username, raw_alpha, raw_key)
 
+      beta = result[:beta].read_array_of_type(FFI::TYPE_UINT8, :read_uint8, 32)
+      puts '***** Beta'
+      puts beta
+      v = result[:v].read_array_of_type(FFI::TYPE_UINT8, :read_uint8, 32)
+      puts '***** V'
+      puts v
+      envelope = result[:envelope].read_array_of_type(FFI::TYPE_UINT8, :read_uint8, 112)
+      puts '*** Envelope'
+      puts envelope
 
+      key = result[:key].read_array_of_type(FFI::TYPE_UINT8, :read_uint8, 32)
+      puts '***** Key'
+      puts key
+      y = result[:y].read_array_of_type(FFI::TYPE_UINT8, :read_uint8, 32)
+      puts '***** Y'
+      puts v
 
+      [beta, v, envelope, key, y]
     end
   end
 

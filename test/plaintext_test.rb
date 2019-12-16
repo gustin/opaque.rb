@@ -23,12 +23,12 @@ class PlaintextTest < Minitest::Test
     puts '~) Authenticating OPAQUE Via Ruby ~)'
     alpha = [174, 17, 253, 238, 61, 54, 246, 96, 134, 222, 69, 115, 52, 224, 182, 129, 135, 201, 31, 217, 76, 37, 186, 203, 89, 193, 216, 214, 86, 253, 86, 64]
     key = [174, 17, 253, 238, 61, 54, 246, 96, 134, 222, 69, 115, 52, 224, 182, 129, 135, 201, 31, 217, 76, 37, 186, 203, 89, 193, 216, 214, 86, 253, 86, 64]
-    beta, v, pub_s = Plaintext::Authentication.start('larry', alpha, key)
+    beta, v, envelope, key, y = Plaintext::Authentication.start('larry', alpha, key)
     puts "Beta: #{beta}"
     puts "V: #{v}"
-    puts "PubS: #{pub_s}"
-
-
+    puts "Envelope: #{envelope}"
+    puts "Key: #{key}"
+    puts "Y: #{y}"
   end
 
   def test_generating_totp
