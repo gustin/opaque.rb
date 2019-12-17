@@ -31,7 +31,7 @@ module Plaintext
     ffi_lib '../agent/target/debug/libplaintext_agent.dylib'
 
     attach_function :authenticate_start, [:string, :pointer, :pointer], AuthenticationStruct.by_value
-#    attach_function :authentication_finalize, [:string, :pointer, :pointer], :void
+    attach_function :authenticate_finalize, [:string, :pointer, :pointer], :void
 
     attach_function :registration_start, [:string, :pointer], RegistrationStruct.by_value
     attach_function :registration_finalize, [:string, :pointer, :pointer], :void
@@ -48,22 +48,31 @@ module Plaintext
 
       beta = result[:beta].read_array_of_type(FFI::TYPE_UINT8, :read_uint8, 32)
       puts '***** Beta'
-      puts beta
+      puts beta.inspect
       v = result[:v].read_array_of_type(FFI::TYPE_UINT8, :read_uint8, 32)
       puts '***** V'
-      puts v
+      puts v.inspect
       envelope = result[:envelope].read_array_of_type(FFI::TYPE_UINT8, :read_uint8, 112)
       puts '*** Envelope'
-      puts envelope
+      puts envelope.inspect
 
-      key = result[:key].read_array_of_type(FFI::TYPE_UINT8, :read_uint8, 32)
+      key = result[:key].read_array_of_type(FFI::TYPE_UINT8, :read_uint8, 192)
       puts '***** Key'
-      puts key
+      puts key.inspect
       y = result[:y].read_array_of_type(FFI::TYPE_UINT8, :read_uint8, 32)
       puts '***** Y'
-      puts v
+      puts v.inspect
 
       [beta, v, envelope, key, y]
+    end
+
+    def self.finalize(username, key, x)
+      packed_key = key.pack('C*')
+      raw_key = FFI::MemoryPointer.from_string(packed_key)
+      packed_x = x.pack('C*')
+      raw_x = FFI::MemoryPointer.from_string(packed_x)
+
+      result = Plaintext::Library.authenticate_finalize(username, raw_key, raw_x)
     end
   end
 
@@ -82,10 +91,10 @@ module Plaintext
       # ap = FFI::AutoPointer.from_native(result[:beta], nil)
       beta = result[:beta].read_array_of_type(FFI::TYPE_UINT8, :read_uint8, 32)
       puts '***** Beta'
-      puts beta
+      puts beta.inspect
       v = result[:v].read_array_of_type(FFI::TYPE_UINT8, :read_uint8, 32)
       puts '***** V'
-      puts v
+      puts v.inspect
       pub_s = result[:pub_s].read_array_of_type(FFI::TYPE_UINT8, :read_uint8, 32)
       #      puts pub_s
 
