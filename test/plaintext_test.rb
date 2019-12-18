@@ -6,6 +6,7 @@ class PlaintextTest < Minitest::Test
   end
 
   def test_registration
+    skip('yo')
     puts '~) Registration OPAQUE Via Ruby ~)'
     alpha = [226, 35, 157, 8, 63, 97, 171, 99, 69, 189, 159, 141, 180, 4, 203, 46, 116, 119, 130, 203, 210, 2, 185, 200, 136, 149, 83, 102, 196, 13, 109, 9]
     beta, v, pub_s = Plaintext::Registration.start('barry', alpha)
@@ -32,8 +33,7 @@ class PlaintextTest < Minitest::Test
   end
 
   def test_generating_totp
-    skip('qr')
     puts '~)- Ruby Land ~)-'
-    puts Plaintext::AuthN.generate_qr('user 12')
+    puts Plaintext::Authentication.second_factor('user 12')
   end
 end

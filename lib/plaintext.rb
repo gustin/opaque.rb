@@ -56,6 +56,12 @@ module Plaintext
       [beta, v, envelope, key, y]
     end
 
+    def self.second_factor(username)
+      qr_code, ptr = AuthN::FII.generate_qr(username)
+      FFI::AutoPointer.new(ptr, AuthN::FII.method(:free_qr))
+      qr_code
+    end
+
     def self.finalize(username, key, x)
       packed_key = key.pack('C*')
       raw_key = FFI::MemoryPointer.from_string(packed_key)
@@ -119,7 +125,7 @@ module Plaintext
     end
 
     def self.generate_qr(username)
-      FII.generate_qr(username)
+      FII.generate_qr(usernamea)
     end
 
     def to_s
@@ -133,7 +139,7 @@ module Plaintext
       ffi_lib '../agent/target/debug/libplaintext_agent.dylib'
 
       attach_function :free_qr, :free_totp_qr, [AuthN], :void
-      attach_function :generate_qr, :generate_totp_qr, [:string], AuthN
+      attach_function :generate_qr, :generate_totp_qr, [:string], :strptr
     end
   end
 end
