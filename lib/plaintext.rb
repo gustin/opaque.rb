@@ -31,7 +31,8 @@ module Plaintext
     ffi_lib '../agent/target/debug/libplaintext_agent.dylib'
 
     attach_function :authenticate_start, [:string, :pointer, :pointer], AuthenticationStruct.by_value
-    attach_function :authenticate_finalize, [:string, :pointer, :pointer], :void
+    attach_function :authenticate_finalize, [:string, :pointer, :pointer], :strptr
+    attach_function :free_token, [:pointer], :void
 
     attach_function :registration_start, [:string, :pointer], RegistrationStruct.by_value
     attach_function :registration_finalize, [:string, :pointer, :pointer], :void
@@ -47,21 +48,10 @@ module Plaintext
       result = Plaintext::Library.authenticate_start(username, raw_alpha, raw_key)
 
       beta = result[:beta].read_array_of_type(FFI::TYPE_UINT8, :read_uint8, 32)
-      puts '***** Beta'
-      puts beta.inspect
       v = result[:v].read_array_of_type(FFI::TYPE_UINT8, :read_uint8, 32)
-      puts '***** V'
-      puts v.inspect
       envelope = result[:envelope].read_array_of_type(FFI::TYPE_UINT8, :read_uint8, 112)
-      puts '*** Envelope'
-      puts envelope.inspect
-
       key = result[:key].read_array_of_type(FFI::TYPE_UINT8, :read_uint8, 192)
-      puts '***** Key'
-      puts key.inspect
       y = result[:y].read_array_of_type(FFI::TYPE_UINT8, :read_uint8, 32)
-      puts '***** Y'
-      puts v.inspect
 
       [beta, v, envelope, key, y]
     end
@@ -72,7 +62,9 @@ module Plaintext
       packed_x = x.pack('C*')
       raw_x = FFI::MemoryPointer.from_string(packed_x)
 
-      result = Plaintext::Library.authenticate_finalize(username, raw_key, raw_x)
+      token, ptr = Plaintext::Library.authenticate_finalize(username, raw_key, raw_x)
+      FFI::AutoPointer.new(ptr, Plaintext::Library.method(:free_token))
+      token
     end
   end
 
