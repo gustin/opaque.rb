@@ -2,6 +2,10 @@ require 'ffi'
 require 'plaintext/version'
 
 module Plaintext
+  OPAQUE_SIZE = 32
+  ENVELOPE_SIZE = 112
+  KEY_EXCHANGE_SIZE = 192
+
   class RegistrationStruct < FFI::Struct
     layout :beta, :pointer,
            :v, :pointer,
@@ -47,11 +51,11 @@ module Plaintext
 
       result = Plaintext::Library.authenticate_start(username, raw_alpha, raw_key)
 
-      beta = result[:beta].read_array_of_type(FFI::TYPE_UINT8, :read_uint8, 32)
-      v = result[:v].read_array_of_type(FFI::TYPE_UINT8, :read_uint8, 32)
-      envelope = result[:envelope].read_array_of_type(FFI::TYPE_UINT8, :read_uint8, 112)
-      key = result[:key].read_array_of_type(FFI::TYPE_UINT8, :read_uint8, 192)
-      y = result[:y].read_array_of_type(FFI::TYPE_UINT8, :read_uint8, 32)
+      beta = result[:beta].read_array_of_type(FFI::TYPE_UINT8, :read_uint8, OPAQUE_SIZE)
+      v = result[:v].read_array_of_type(FFI::TYPE_UINT8, :read_uint8, OPAQUE_SIZE)
+      envelope = result[:envelope].read_array_of_type(FFI::TYPE_UINT8, :read_uint8, ENVELOPE_SIZE)
+      key = result[:key].read_array_of_type(FFI::TYPE_UINT8, :read_uint8, KEY_EXCHANGE_SIZE)
+      y = result[:y].read_array_of_type(FFI::TYPE_UINT8, :read_uint8, OPAQUE_SIZE)
 
       [beta, v, envelope, key, y]
     end
@@ -82,26 +86,12 @@ module Plaintext
       raw_data = FFI::MemoryPointer.from_string(packed_data)
       result = Plaintext::Library.registration_start(username, raw_data)
 
-      #      beta = FFI::MemoryPointer.new(:char, 32)
-      #      beta.put_bytes(0, result[:beta])
-
       # LEAK: move to memory or auto pointers
       # ap = FFI::AutoPointer.from_native(result[:beta], nil)
-      beta = result[:beta].read_array_of_type(FFI::TYPE_UINT8, :read_uint8, 32)
-      puts '***** Beta'
-      puts beta.inspect
-      v = result[:v].read_array_of_type(FFI::TYPE_UINT8, :read_uint8, 32)
-      puts '***** V'
-      puts v.inspect
-      pub_s = result[:pub_s].read_array_of_type(FFI::TYPE_UINT8, :read_uint8, 32)
-      #      puts pub_s
+      beta = result[:beta].read_array_of_type(FFI::TYPE_UINT8, :read_uint8, OPAQUE_SIZE)
+      v = result[:v].read_array_of_type(FFI::TYPE_UINT8, :read_uint8, OPAQUE_SIZE)
+      pub_s = result[:pub_s].read_array_of_type(FFI::TYPE_UINT8, :read_uint8, OPAQUE_SIZE)
 
-      # raw_data.get_bytes(0, width * height).unpack("C*")
-
-      # Note, other option:
-      # https://github.com/ffi/ffi/wiki/Binary-data
-      # memBuf = FFI::MemoryPointer.new(:char, data.bytesize)
-      # memBuf.put_bytes(0, data)
       [beta, v, pub_s]
     end
 
