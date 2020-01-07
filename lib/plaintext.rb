@@ -32,7 +32,7 @@ module Plaintext
     class Error < StandardError; end
 
     extend FFI::Library
-    ffi_lib '../agent/target/debug/libplaintext_agent.dylib'
+    ffi_lib '../releases/rust-sdk/libplaintext_agent.dylib'
 
     attach_function :authenticate_start, [:string, :pointer, :pointer], AuthenticationStruct.by_value
     attach_function :authenticate_finalize, [:string, :pointer, :pointer], :strptr
@@ -126,7 +126,7 @@ module Plaintext
       class Error < StandardError; end
 
       extend FFI::Library
-      ffi_lib '../agent/target/debug/libplaintext_agent.dylib'
+      ffi_lib '../releases/rust-sdk/libplaintext_agent.dylib'
 
       attach_function :free_qr, :free_totp_qr, [AuthN], :void
       attach_function :generate_qr, :generate_totp_qr, [:string], :strptr
