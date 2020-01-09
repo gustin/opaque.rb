@@ -21,4 +21,6 @@ module Plaintext::Library
   # authenticator, 2nd factor, possession
   attach_function :generate_qr_code, :generate_qr_code, [:string], :strptr
   attach_function :free_qr_code, :free_qr_code, [:string], :void
+
+  attach_function :authenticator_confirm_code, [:string], :bool
 end

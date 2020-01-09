@@ -64,6 +64,6 @@ class PlaintextTest < Minitest::Test
 
   def test_generating_qr_code
     puts '~)- Ruby Land ~)-'
-    puts Plaintext::Authentication.second_factor('user 12')
+    puts Plaintext::Authentication.generate_second_factor('user 12')
   end
 end
