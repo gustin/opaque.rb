@@ -21,25 +21,27 @@ class Plaintext::Authentication
     result = Plaintext::Library.authenticate_start(username, raw_alpha, raw_key)
 
     beta = result[:beta].read_array_of_type(
-      FFI::TYPE_UINT8, :read_uint8, OPAQUE_SIZE
+      FFI::TYPE_UINT8, :read_uint8, Plaintext::OPAQUE_FACTOR_SIZE
     )
     v = result[:v].read_array_of_type(
-      FFI::TYPE_UINT8, :read_uint8, OPAQUE_SIZE
+      FFI::TYPE_UINT8, :read_uint8, Plaintext::OPAQUE_FACTOR_SIZE
     )
     envelope = result[:envelope].read_array_of_type(
-      FFI::TYPE_UINT8, :read_uint8, ENVELOPE_SIZE
+      FFI::TYPE_UINT8, :read_uint8, Plaintext::OPAQUE_ENVELOPE_SIZE
     )
     key = result[:key].read_array_of_type(
-      FFI::TYPE_UINT8, :read_uint8, KEY_EXCHANGE_SIZE
+      FFI::TYPE_UINT8, :read_uint8, Plaintext::SIGMA_KEY_EXCHANGE_SIZE
     )
-    y = result[:y].read_array_of_type(FFI::TYPE_UINT8, :read_uint8, OPAQUE_SIZE)
+    y = result[:y].read_array_of_type(
+      FFI::TYPE_UINT8, :read_uint8, Plaintext::OPAQUE_FACTOR_SIZE
+    )
 
     [beta, v, envelope, key, y]
   end
 
   def self.second_factor(username)
-    qr_code, ptr = Authentication::FII.generate_qr_code(username)
-    FFI::AutoPointer.new(ptr, Library::FII.method(:free_qr))
+    qr_code, ptr = Plaintext::Library.generate_qr_code(username)
+    FFI::AutoPointer.new(ptr, Plaintext::Library.method(:free_qr_code))
     qr_code
   end
 
@@ -49,10 +51,10 @@ class Plaintext::Authentication
     packed_x = x.pack('C*')
     raw_x = FFI::MemoryPointer.from_string(packed_x)
 
-    token, ptr = Library.authenticate_finalize(
+    token, ptr = Plaintext::Library.authenticate_finalize(
       username, raw_key, raw_x
     )
-    FFI::AutoPointer.new(ptr, Library.method(:free_token))
+    FFI::AutoPointer.new(ptr, Plaintext::Library.method(:free_token))
     token
   end
 end

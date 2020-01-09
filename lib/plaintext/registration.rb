@@ -9,6 +9,8 @@ class Plaintext::RegistrationStruct < FFI::Struct
   end
 end
 
+require_relative 'library'
+
 class Plaintext::Registration
   def self.start(username, alpha)
     # https://www.rubydoc.info/stdlib/core/Array:pack
@@ -20,13 +22,13 @@ class Plaintext::Registration
     # LEAK: move to memory or auto pointers
     # ap = FFI::AutoPointer.from_native(result[:beta], nil)
     beta = result[:beta].read_array_of_type(
-      FFI::TYPE_UINT8, :read_uint8, PLAINTEXT::OPAQUE_FACTOR_SIZE
+      FFI::TYPE_UINT8, :read_uint8, Plaintext::OPAQUE_FACTOR_SIZE
     )
     v = result[:v].read_array_of_type(
-      FFI::TYPE_UINT8, :read_uint8, PLAINTEXT::OPAQUE_FACTOR_SIZE
+      FFI::TYPE_UINT8, :read_uint8, Plaintext::OPAQUE_FACTOR_SIZE
     )
     pub_s = result[:pub_s].read_array_of_type(
-      FFI::TYPE_UINT8, :read_uint8, PLAINTEXT::OPAQUE_FACTOR_SIZE
+      FFI::TYPE_UINT8, :read_uint8, Plaintext::OPAQUE_FACTOR_SIZE
     )
 
     [beta, v, pub_s]
@@ -38,7 +40,7 @@ class Plaintext::Registration
     packed_envelope = envelope.pack('C*')
     raw_envelope = FFI::MemoryPointer.from_string(packed_envelope)
 
-    result = Library.registration_finalize(
+    result = Plaintext::Library.registration_finalize(
       username,
       raw_public_key,
       raw_envelope

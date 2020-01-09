@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
 
   spec.summary = %q{Write a short summary, because RubyGems requires one.}
   spec.description = %q{Write a longer description or delete this line.}
-  spec.homepage = 'https://www.plaintext.io'
+  spec.homepage = 'https://www.getplaintext.com'
 
   spec.metadata['allowed_push_host'] = "TODO: Set to 'http://mygemserver.com'"
 
