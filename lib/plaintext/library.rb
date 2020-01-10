@@ -3,7 +3,7 @@ module Plaintext::Library
   class Error < StandardError; end
 
   extend FFI::Library
-  ffi_lib '../releases/core-sdk/libplaintext_sdk_core_v0.1.1.dylib'
+  ffi_lib '../releases/core-sdk/libplaintext_core_sdk_v0.1.1.dylib'
 
   # authentication, currently via 1 knowledge factor (opaque)
   attach_function :authenticate_start, [:string, :pointer, :pointer],
