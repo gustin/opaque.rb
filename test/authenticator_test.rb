@@ -7,6 +7,7 @@ class AuthenticatorTest < Minitest::Test
   end
 
   def test_second_factor_confirmation
-    puts Plaintext::Authenticator.confirm_second_factor('123456')
+    Plaintext::Authenticator.generate_second_factor('user 12')
+    puts Plaintext::Authenticator.confirm_second_factor('user 12', 'abracadabra')
   end
 end

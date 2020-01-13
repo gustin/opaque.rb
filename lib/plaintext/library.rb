@@ -22,5 +22,5 @@ module Plaintext::Library
   attach_function :generate_qr_code, :generate_qr_code, [:string], :strptr
   attach_function :free_qr_code, :free_qr_code, [:string], :void
 
-  attach_function :confirm_second_factor, [:string], :bool
+  attach_function :confirm_second_factor, [:string, :string], :bool
 end

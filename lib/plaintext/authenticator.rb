@@ -6,9 +6,9 @@ class Plaintext::Authenticator
     qr_code
   end
 
-  def self.confirm_second_factor(code)
+  def self.confirm_second_factor(username, code)
 #    packed_code = code.pack('C*')
 #    raw_code = FFI::MemoryPointer.from_string(code)
-    valid = Plaintext::Library.confirm_second_factor(code)
+    valid = Plaintext::Library.confirm_second_factor(username, code)
   end
 end
