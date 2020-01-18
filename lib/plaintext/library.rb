@@ -23,4 +23,8 @@ module Plaintext::Library
   attach_function :free_qr_code, :free_qr_code, [:string], :void
 
   attach_function :confirm_second_factor, [:string, :string], :bool
+
+  # webauthn
+  attach_function :webauthn_registration_challenge, [:string], :strptr
+  attach_function :webauthn_free_challenge, [:string], :void
 end
