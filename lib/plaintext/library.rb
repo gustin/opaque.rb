@@ -27,4 +27,5 @@ module Plaintext::Library
   # webauthn
   attach_function :webauthn_registration_challenge, [:string], :strptr
   attach_function :webauthn_free_challenge, [:string], :void
+  attach_function :webauthn_register_credential, [:string, :string], :bool
 end
