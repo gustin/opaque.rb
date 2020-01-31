@@ -18,6 +18,10 @@ module Plaintext::Library
   attach_function :registration_finalize,
     [:string, :pointer, :pointer], :void
 
+  # client registration
+  attach_function :opaque_client_registration_start, [:string],
+    Plaintext::ClientRegistrationStruct.by_value
+
   # authenticator, 2nd factor, possession
   attach_function :generate_qr_code, :generate_qr_code, [:string], :strptr
   attach_function :free_qr_code, :free_qr_code, [:string], :void

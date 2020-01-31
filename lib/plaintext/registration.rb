@@ -9,7 +9,16 @@ class Plaintext::RegistrationStruct < FFI::Struct
   end
 end
 
-require_relative 'library'
+class Plaintext::ClientRegistrationStruct < FFI::Struct
+  layout :alpha, :pointer,
+         :pub_u, :pointer,
+         :priv_u, :pointer
+
+  def to_s
+    "Result:(#{self[:alpha]},#{self[:pub_u]}),#{self[:priv_u]}"
+  end
+end
+
 
 class Plaintext::Registration
   def self.start(username, alpha)
@@ -45,5 +54,21 @@ class Plaintext::Registration
       raw_public_key,
       raw_envelope
     )
+  end
+
+  def self.client_start(password)
+    result = Plaintext::Library.opaque_client_registration_start(password)
+
+    alpha = result[:alpha].read_array_of_type(
+      FFI::TYPE_UINT8, :read_uint8, Plaintext::OPAQUE_FACTOR_SIZE
+    )
+    pub_u = result[:pub_u].read_array_of_type(
+      FFI::TYPE_UINT8, :read_uint8, Plaintext::OPAQUE_FACTOR_SIZE
+    )
+    priv_u = result[:priv_u].read_array_of_type(
+      FFI::TYPE_UINT8, :read_uint8, Plaintext::OPAQUE_FACTOR_SIZE
+    )
+
+    [alpha, pub_u, priv_u]
   end
 end
