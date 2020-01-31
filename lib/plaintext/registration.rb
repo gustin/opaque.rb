@@ -71,4 +71,26 @@ class Plaintext::Registration
 
     [alpha, pub_u, priv_u]
   end
+
+  def self.client_finalize(password, beta, v, public_key, public_server_key,
+                           private_key)
+    packed_beta = beta.pack('C*')
+    raw_beta = FFI::MemoryPointer.from_string(packed_beta)
+    packed_v = v.pack('C*')
+    raw_v = FFI::MemoryPointer.from_string(packed_v)
+    packed_public_key = public_key.pack('C*')
+    raw_public_key = FFI::MemoryPointer.from_string(packed_public_key)
+    packed_public_server_key = public_server_key.pack('C*')
+    raw_public_server_key = FFI::MemoryPointer.from_string(packed_public_server_key)
+    packed_private_key = private_key.pack('C*')
+    raw_private_key = FFI::MemoryPointer.from_string(packed_private_key)
+
+    envelope = Plaintext::Library.opaque_client_registration_finalize(
+      password, raw_beta, raw_v,
+      raw_public_key, raw_public_server_key, raw_private_key
+    )
+    envelope.read_array_of_type(
+      FFI::TYPE_UINT8, :read_uint8, Plaintext::OPAQUE_ENVELOPE_SIZE
+    )
+  end
 end
